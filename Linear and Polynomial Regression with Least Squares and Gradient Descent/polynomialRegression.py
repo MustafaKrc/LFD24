@@ -30,8 +30,14 @@ def leastSquares(X, Y, degree):
     # You need to define and compute Vandermonde matrix first.                   #
     ##############################################################################
     # Replace "pass" statement with your code
- 
-    pass
+
+    # Form the Vandermonde matrix
+    V = np.ones((X.shape[0], 1))
+    for i in range(1, degree + 1):
+        V = np.concatenate((V, X**i), axis=1)
+    # Compute the weights using the normal equation
+    W = np.linalg.inv(V.T @ V) @ V.T @ Y
+    X_poly = V
     
     ##############################################################################
     #                             END OF YOUR CODE                               #
@@ -61,7 +67,7 @@ class gradientDescent():
         ##############################################################################
         #  Replace "pass" statement with your code
         
-	pass
+        pass
         
         ##############################################################################
         #                             END OF YOUR CODE                               #
@@ -97,7 +103,7 @@ class gradientDescent():
 
         # Replace "pass" statement with your code
         
-	pass 
+        pass 
 	
         ##############################################################################
         #                             END OF YOUR CODE                               #

@@ -23,8 +23,10 @@ def leastSquares(X, Y):
     ##############################################################################
     # Replace "pass" statement with your code
  
-    pass
-    
+    # Add a bias term to X
+    X_b = np.concatenate((np.ones((X.shape[0], 1)), X), axis=1)
+    # Compute the weights using the normal equation
+    w = np.linalg.inv(X_b.T @ X_b) @ X_b.T @ Y
     
     ##############################################################################
     #                             END OF YOUR CODE                               #
