@@ -43,6 +43,12 @@ class gradientDescent():
         self.w = w.copy()
         self.weight_history = [self.w]
         self.cost_history = [np.sum(np.square(self.predict(self.x)-self.y))/self.x.shape[0]]
+
+    def cost(self):
+        """
+            Utitlity method for calculating the MSE for the current set of weights
+        """
+        return np.sum(np.square(self.predict(self.x) - self.y)) / self.x.shape[0]
         
     def gradient(self):
         gradient = np.zeros_like(self.w)
@@ -52,7 +58,8 @@ class gradientDescent():
         ##############################################################################
         #  Replace "pass" statement with your code
         
-        pass
+        # calculate the gradient of the MSE for the current set of weights
+        gradient = -1 * (self.x.T @ (self.y - self.predict(self.x))) / self.x.shape[0]
         
         ##############################################################################
         #                             END OF YOUR CODE                               #
@@ -86,8 +93,18 @@ class gradientDescent():
         # iteration as (lr =(1/k+1), here k is iteration).                           #
         ##############################################################################
 
-        # Replace "pass" statement with your code
-        pass
+        flag = lr == "diminishing"
+        for k in range(n_iterations):
+            if flag:
+                self.w -= (1 / (k + 2)) * self.gradient() # k starts from zero
+            else:
+                self.w -= self.lr * self.gradient()
+            self.weight_history.append(self.w)
+            self.cost_history.append(self.cost())
+            # Check if the error is less than self.epsilon and then terminate if so
+            if abs(self.cost_history[-1] - self.cost_history[-2]) / self.x.shape[0] < self.epsilon:
+                break
+
         ##############################################################################
         #                             END OF YOUR CODE                               #
         ##############################################################################
