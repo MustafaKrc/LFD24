@@ -13,6 +13,12 @@ class gradientDescent():
         self.w = w.copy()
         self.weight_history = [self.w]
         self.cost_history = [np.sum(np.square(self.predict(self.x)-self.y))/self.x.shape[0]]
+
+    def cost(self):
+        """
+            Utitlity method for calculating the MSE for the current set of weights
+        """
+        return np.sum(np.square(self.predict(self.x) - self.y)) / self.x.shape[0]
         
     def gradient(self):
         gradient = np.zeros_like(self.w)
@@ -22,7 +28,7 @@ class gradientDescent():
         ##############################################################################
         #  Replace "pass" statement with your code
         
-        pass
+        gradient = -1 * (self.x.T @ (self.y - self.predict(self.x))) / self.x.shape[0]
         
         ##############################################################################
         #                             END OF YOUR CODE                               #
@@ -56,8 +62,18 @@ class gradientDescent():
         # iteration as (lr =(1/k+1), here k is iteration).                           #
         ##############################################################################
 
-        # Replace "pass" statement with your code
-        pass
+        flag = lr == "diminishing"
+        for k in range(n_iterations):
+            if flag:
+                self.w -= (1 / (k + 2)) * self.gradient() # k starts from zero
+            else:
+                self.w -= self.lr * self.gradient()
+            self.weight_history.append(self.w)
+            self.cost_history.append(self.cost())
+            # Check if the error is less than self.epsilon and then terminate if so
+            if abs(self.cost_history[-1] - self.cost_history[-2]) / self.x.shape[0] < self.epsilon:
+                break
+
         ##############################################################################
         #                             END OF YOUR CODE                               #
         ##############################################################################
@@ -101,9 +117,23 @@ class gradientDescent():
         #returns the average cross-validated error, providing a reliable             #
         #estimate of the model's generalization performance.                         #
         ##############################################################################
-        # Replace "pass" statement with your code                                    #
-        
+        """                             
+        # not tested at all
+        for i in range(k):
+            start = i * fold_size
+            end = (i + 1) * fold_size
+            x_val = self._x_train[:, start:end]
+            y_val = self._y_train[start:end]
+            x_train = np.concatenate((self._x_train[:, :start], self._x_train[:, end:]), axis=1)
+            y_train = np.concatenate((self._y_train[:start], self._y_train[end:]))
+
+            model = gradientDescent(x_train, y_train, self.w, self.lr, self.num_iters)
+            model.fit()
+            y_pred = model.predict(x_val)
+            cross_val_error.append(np.sum(np.square(y_pred - y_val)) / x_val.shape[0])
+        """
         pass
+
         
         ##############################################################################
         #                             END OF YOUR CODE                               #
@@ -132,13 +162,18 @@ class SGD():
         ##############################################################################
         #  Replace "pass" statement with your code
         
-        pass
+        gradient = -1 * (self.x.T @ (self.y - self.predict(self.x))) / self.x.shape[0]
         
         ##############################################################################
         #                             END OF YOUR CODE                               #
         ##############################################################################
         return gradient
     
+    def cost(self):
+        """
+            Utitlity method for calculating the MSE for the current set of weights
+        """
+        return np.sum(np.square(self.predict(self.x) - self.y)) / self.x.shape[0]
     
     def fit(self,lr=None, n_iterations=None):
         k = 0
@@ -168,8 +203,19 @@ class SGD():
         # iteration as (lr =(1/k+1), here k is iteration).                           #
         ##############################################################################
 
-        # Replace "pass" statement with your code
-        pass
+        flag = lr == "diminishing"
+
+        # pick a sample from the training set
+        random_index = np.random.randint(self.x.shape[0])
+        sample_x = self.x[random_index]
+        sample_y = self.y[random_index]
+
+        if flag:
+            self.w -= (1 / (k + 2)) * self.gradient() # k starts from zero
+        else:
+            self.w -= self.lr * self.gradient()
+
+
         ##############################################################################
         #                             END OF YOUR CODE                               #
         ##############################################################################

@@ -159,3 +159,4 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 Linear and Polynomial Regression with Least Squares and Gradient Descent/Homework-1.html
+Gradient Descent, Stochastic Gradient Descent, Data Normalization, Cross Validation for Regression/Homework_2.html

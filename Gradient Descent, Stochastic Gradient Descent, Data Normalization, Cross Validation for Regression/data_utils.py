@@ -20,7 +20,7 @@ class MinMaxScaler():
         ##############################################################################
         # Replace "pass" statement with your code
         
-        pass
+        x_scaled = (x_scaled - self.min) / (self.max - self.min) * (self.max_limit - self.min_limit) + self.min_limit
         
         ##############################################################################
         #                             END OF YOUR CODE                               #
@@ -38,7 +38,11 @@ class MinMaxScaler():
         ##############################################################################
         # Replace "pass" statement with your code
         
-        pass
+        x -= self.min_limit
+        x /= (self.max_limit - self.min_limit)
+        x *= (self.max - self.min)
+        x += self.min
+        
         
         ##############################################################################
         #                             END OF YOUR CODE                               #
