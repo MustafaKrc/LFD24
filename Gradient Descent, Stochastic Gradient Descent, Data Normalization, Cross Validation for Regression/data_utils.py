@@ -30,7 +30,7 @@ class MinMaxScaler():
     
     def inverse_transform(self, x_scaled):
         
-        x = x_scaled
+        x = x_scaled.copy()
         
         ##############################################################################
         # TODO: Implement inverse min max scaler that scale a data range back into   #

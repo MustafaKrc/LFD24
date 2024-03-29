@@ -71,7 +71,7 @@ class gradientDescent():
             self.weight_history.append(self.w)
             self.cost_history.append(self.cost())
             # Check if the error is less than self.epsilon and then terminate if so
-            if abs(self.cost_history[-1] - self.cost_history[-2]) / self.x.shape[0] < self.epsilon:
+            if abs(self.cost_history[-1] - self.cost_history[-2])< self.epsilon:
                 break
 
         ##############################################################################
@@ -154,15 +154,17 @@ class SGD():
         self.weight_history = [self.w]
         self.cost_history = [np.sum(np.square(self.predict(self.x)-self.y))/self.x.shape[0]]
         
-    def gradient(self):
+    def gradient(self, x, y):
         gradient = np.zeros_like(self.w)
         ##############################################################################
         # TODO: Calculate gradient of gradient descent algorithm.                    #
         #                                                                            #
         ##############################################################################
         #  Replace "pass" statement with your code
-        
-        gradient = -1 * (self.x.T @ (self.y - self.predict(self.x))) / self.x.shape[0]
+        x = x.reshape(-1, 1) # takes transpose of 1d array
+
+        gradient = -1 * (x @ (y - self.predict(x.T))) / x.T.shape[0]
+
         
         ##############################################################################
         #                             END OF YOUR CODE                               #
@@ -205,16 +207,22 @@ class SGD():
 
         flag = lr == "diminishing"
 
-        # pick a sample from the training set
-        random_index = np.random.randint(self.x.shape[0])
-        sample_x = self.x[random_index]
-        sample_y = self.y[random_index]
+        for k in range(n_iterations):
+            # pick a sample from the training set
+            random_index = np.random.randint(self.x.shape[0])
+            sample_x = np.array(self.x[random_index])
+            sample_y = np.array(self.y[random_index])
 
-        if flag:
-            self.w -= (1 / (k + 2)) * self.gradient() # k starts from zero
-        else:
-            self.w -= self.lr * self.gradient()
+            if flag:
+                self.w -= (1 / (k + 2)) * self.gradient(sample_x, sample_y) # k starts from zero
+            else:
+                self.w -= self.lr * self.gradient(sample_x, sample_y)
 
+            self.weight_history.append(self.w)
+            self.cost_history.append(self.cost())
+            # Check if the error is less than self.epsilon and then terminate if so
+            if abs(self.cost_history[-1] - self.cost_history[-2]) < self.epsilon:
+                break
 
         ##############################################################################
         #                             END OF YOUR CODE                               #
@@ -228,6 +236,7 @@ class SGD():
         y_pred = x.dot(self.w)
 
         return y_pred
+    
         
     def cross_validate(self, k=5):
         """
