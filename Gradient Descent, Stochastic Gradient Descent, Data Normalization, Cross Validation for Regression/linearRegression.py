@@ -4,8 +4,8 @@ def rel_error(x, y):
     return np.max(np.abs(x - y) / (np.maximum(1e-8, np.abs(x) + np.abs(y))))
 
 class gradientDescent():
-    def __init__(self, x, y, w, lr, num_iters):
-        self.x = np.c_[np.ones((x.shape[0], 1)), x]
+    def __init__(self, x, y, w, lr, num_iters, add_bias=True):
+        self.x = np.c_[np.ones((x.shape[0], 1)), x] if add_bias else x.copy()
         self.y = y
         self.lr = lr
         self.num_iters = num_iters
@@ -34,7 +34,6 @@ class gradientDescent():
         #                             END OF YOUR CODE                               #
         ##############################################################################
         return gradient
-    
     
     def fit(self,lr=None, n_iterations=None):
         k = 0
@@ -98,13 +97,12 @@ class gradientDescent():
         - float: Cross-validated error.
         """
         np.random.seed(42)
-        m = self._x_train.shape[1]
+        m = self.x.shape[0]
         fold_size = m // k
         indices = np.arange(m)
         np.random.shuffle(indices)
 
         cross_val_error = []
-
         ##############################################################################
         # TODO: The cross_validate function is designed to perform k-fold            #
         # cross-validation, a technique used to evaluate the performance of a        #
@@ -117,22 +115,32 @@ class gradientDescent():
         #returns the average cross-validated error, providing a reliable             #
         #estimate of the model's generalization performance.                         #
         ##############################################################################
-        """                             
-        # not tested at all
-        for i in range(k):
-            start = i * fold_size
-            end = (i + 1) * fold_size
-            x_val = self._x_train[:, start:end]
-            y_val = self._y_train[start:end]
-            x_train = np.concatenate((self._x_train[:, :start], self._x_train[:, end:]), axis=1)
-            y_train = np.concatenate((self._y_train[:start], self._y_train[end:]))
 
-            model = gradientDescent(x_train, y_train, self.w, self.lr, self.num_iters)
+        for i in range(k):
+            # Create the validation set
+            start = i * fold_size
+            end = (i + 1) * fold_size if i != k - 1 else None
+            x_val = self.x[start:end]
+            y_val = self.y[start:end]
+
+            # Create the training set
+            x_train = np.concatenate((self.x[:start], self.x[end:]))
+            y_train = np.concatenate((self.y[:start], self.y[end:]))
+            
+            # Create the model
+            model = gradientDescent(x_train, y_train, self.w, self.lr, self.num_iters, add_bias=False)
+
+            # Train the model
             model.fit()
+
+            # Make predictions on the validation set
             y_pred = model.predict(x_val)
-            cross_val_error.append(np.sum(np.square(y_pred - y_val)) / x_val.shape[0])
-        """
-        pass
+
+            # Calculate the error
+            error = np.sqrt(np.sum(np.square(y_pred - y_val)))
+
+            # Record the error
+            cross_val_error.append(error)
 
         
         ##############################################################################
