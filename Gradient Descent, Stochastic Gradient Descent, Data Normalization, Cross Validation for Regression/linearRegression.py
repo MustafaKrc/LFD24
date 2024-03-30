@@ -29,7 +29,7 @@ class gradientDescent():
         #  Replace "pass" statement with your code
         
         gradient = -1 * (self.x.T @ (self.y - self.predict(self.x))) / self.x.shape[0]
-        
+
         ##############################################################################
         #                             END OF YOUR CODE                               #
         ##############################################################################
