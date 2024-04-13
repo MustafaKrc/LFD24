@@ -59,6 +59,7 @@ class MinMaxScaler():
     def transform(self, x):
         if self.min is None or self.max is None:
             raise ValueError("MinMaxScaler must be fit before transform.")
+        
         ##############################################################################
         # TODO: Implement min max scaler function that scale a data range into       #
         # min_limit and max_limit                                                    #
@@ -67,7 +68,10 @@ class MinMaxScaler():
         ##############################################################################
         # Replace "pass" statement with your code
         
-        pass
+        x_scaled = x.copy()
+        for row in range(x.shape[0]):
+            x_scaled[row] = (x_scaled[row] - self.min[row]) / (self.max[row] - self.min[row]) * (self.max_limit - self.min_limit) + self.min_limit 
+        
         
         ##############################################################################
         #                             END OF YOUR CODE                               #
@@ -88,7 +92,10 @@ class MinMaxScaler():
         ##############################################################################
         # Replace "pass" statement with your code
         
-        pass
+        x -= self.min_limit
+        x /= (self.max_limit - self.min_limit)
+        x *= (self.max - self.min)
+        x += self.min
         
         ##############################################################################
         #                             END OF YOUR CODE                               #

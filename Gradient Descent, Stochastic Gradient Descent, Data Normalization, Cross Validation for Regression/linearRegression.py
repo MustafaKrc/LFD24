@@ -169,7 +169,7 @@ class SGD():
         #                                                                            #
         ##############################################################################
         #  Replace "pass" statement with your code
-        x = x.reshape(-1, 1) # takes transpose of 1d array
+        x = x.reshape(-1, 1)
 
         gradient = -1 * (x @ (y - self.predict(x.T))) / x.T.shape[0]
 
