@@ -144,10 +144,11 @@ class LogisticRegression:
         """
         Computes the gradients of the weights and bias for Mean Squared Error.
         """
+        estimate = self.h_theta(x)
         x = np.insert(x, 0, 1).reshape(-1, 1) # calculate the gradient with bias
-        prediction = x.T.dot(np.concatenate(([self._B], self._W.ravel())).reshape(-1, 1))
+        y = y.reshape(-1, 1)
 
-        gradient = -1 * (x @ (y - prediction)) / x.T.shape[0]
+        gradient = -1 * (x @ ((y - estimate)*(estimate)*(1 - estimate))) / x.T.shape[0]
 
         ##############################################################################
         #                             END OF YOUR CODE                               #
