@@ -128,18 +128,30 @@ class LogisticRegression:
         return f1_score
 
 
-    def compute_gradients(self, x, y):
+    def compute_gradient_CE(self, x, y):
         """
-        Computes the gradients of the weights and bias using SGD.
+        Computes the gradients of the weights and bias for cross entropy.
         """
-        # same gradient function for both cost functions
         
         estimate = self.h_theta(x)
         x = np.insert(x, 0, 1).reshape(-1, 1) # calculate the gradient with bias
         y = y.reshape(-1, 1)
 
         gradient = -1 * (x @ (y - estimate)) / x.T.shape[0]
+        return gradient.T
+    
+    def compute_gradient_MSE(self, x, y):
+        """
+        Computes the gradients of the weights and bias for Mean Squared Error.
+        """
+        x = np.insert(x, 0, 1).reshape(-1, 1) # calculate the gradient with bias
+        prediction = x.T.dot(np.concatenate(([self._B], self._W.ravel())).reshape(-1, 1))
 
+        gradient = -1 * (x @ (y - prediction)) / x.T.shape[0]
+
+        ##############################################################################
+        #                             END OF YOUR CODE                               #
+        ##############################################################################
         return gradient.T
 
 
@@ -166,19 +178,18 @@ class LogisticRegression:
             cost_train = self.compute_cost_MSE(h_train, self._y_train)
             cost_test = self.compute_cost_MSE(h_test, self._y_test)
 
-            print("MSE COST: ", cost_train)
+            #print("MSE COST: ", cost_train)
             #print(cost_train, cost_test)
 
             # pick random samples
             rand_index = np.random.randint(0, self._m)
             sample_x = self._x_train[:, rand_index]
             sample_y = self._y_train[rand_index]
-            gradient = self.compute_gradients(sample_x, sample_y)
-            #print(gradient[:, 1:])
+            gradient = self.compute_gradient_MSE(sample_x, sample_y)
 
             # Update the weights and bias
             self._W -= self._alpha * gradient[:, 1:]
-            self._B -= self._alpha * gradient[:, 0]
+            self._B -= float(self._alpha * gradient[:, 0])
             
             # Calculate the percentage of correctly classified instances
             train_accuracy = self.calculate_accuracy(h_train, self._y_train)
@@ -227,11 +238,11 @@ class LogisticRegression:
             rand_index = np.random.randint(0, self._m)
             sample_x = self._x_train[:, rand_index]
             sample_y = self._y_train[rand_index]
-            gradient = self.compute_gradients(sample_x, sample_y)
+            gradient = self.compute_gradient_CE(sample_x, sample_y)
             
             # Update the weights and bias
             self._W -= self._alpha * gradient[:, 1:]
-            self._B -= self._alpha * gradient[:, 0]
+            self._B -= float(self._alpha * gradient[:, 0])
             
             # Calculate the percentage of correctly classified instances
             train_accuracy = self.calculate_accuracy(h_train, self._y_train)
@@ -244,6 +255,5 @@ class LogisticRegression:
         ##############################################################################
         #                             END OF YOUR CODE                               #
         ############################################################################## 
-
         return classified_correctly_train_list_sgd, classified_correctly_test_list_sgd
 
