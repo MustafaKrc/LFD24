@@ -2,7 +2,7 @@ import numpy as np
 np.random.seed(42)
 class LogisticRegression:
     
-    def __init__(self, x_train, y_train, x_test, y_test):
+    def __init__(self, x_train, y_train, x_test, y_test, lr = None, init_weights = None):
         """
         Constructor assumes an x_train matrix in which each column contains an instance.
         Vector y_train contains binary labels for each instance (0 or 1).
@@ -17,10 +17,10 @@ class LogisticRegression:
         self._y_test = y_test
         self._m = x_train.shape[1]
         
-        self._W = np.random.randn(1, x_train.shape[0]) * 0.02
+        self._W = np.random.randn(1, x_train.shape[0]) * 0.02 if init_weights is None else init_weights
         self._B = 0
         self._Y = y_train.reshape(1, -1)  # Binary labels, no need for one-hot encoding
-        self._alpha = 0.05
+        self._alpha = 0.05 if lr is None else lr
 
     def sigmoid(self, Z):
         """
@@ -83,6 +83,49 @@ class LogisticRegression:
         accuracy = (1 / m) * np.sum(h == y)
 
         return accuracy * 100
+    
+    def calculate_recall(self, h, y):
+        """
+        Calculates the recall.
+        """
+        h = h.reshape(-1, 1)
+        y = y.reshape(-1, 1)
+        tp = np.sum((h == 1) & (y == 1))
+        fn = np.sum((h == 0) & (y == 1))
+
+        if tp + fn == 0:
+            return 0
+
+        recall = tp / (tp + fn)
+        return recall 
+    
+    def calculate_precision(self, h, y):
+        """
+        Calculates the precision.
+        """
+        h = h.reshape(-1, 1)
+        y = y.reshape(-1, 1)
+        tp = np.sum((h == 1) & (y == 1))
+        fp = np.sum((h == 1) & (y == 0))
+
+        if tp + fp == 0:
+            return 0
+
+        precision = tp / (tp + fp)
+        return precision 
+    
+    def calculate_f1_score(self, h, y):
+        """
+        Calculates the F1 score.
+        """
+        recall = self.calculate_recall(h, y)
+        precision = self.calculate_precision(h, y)
+
+        if recall + precision == 0:
+            return 0
+        
+        f1_score = 2 * (precision * recall) / (precision + recall)
+        return f1_score
 
 
     def compute_gradients(self, x, y):
@@ -92,14 +135,12 @@ class LogisticRegression:
         # same gradient function for both cost functions
         
         estimate = self.h_theta(x)
-        x = np.insert(x, 0, 1) # calculate the gradient with bias
-        x = x.reshape(-1, 1)
+        x = np.insert(x, 0, 1).reshape(-1, 1) # calculate the gradient with bias
         y = y.reshape(-1, 1)
 
         gradient = -1 * (x @ (y - estimate)) / x.T.shape[0]
-        gradient = gradient.T
 
-        return gradient
+        return gradient.T
 
 
     def train_binary_classification(self, iterations):
@@ -179,7 +220,7 @@ class LogisticRegression:
             cost_train = self.compute_cost_CE(h_train, self._y_train)
             cost_test = self.compute_cost_CE(h_test, self._y_test)
 
-            print("CE COST: ", cost_train)
+            #print("CE COST: ", cost_train)
             #print(cost_train, cost_test)
             
             #pick random samples
