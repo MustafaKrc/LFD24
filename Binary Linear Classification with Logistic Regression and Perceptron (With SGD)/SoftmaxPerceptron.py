@@ -1,3 +1,5 @@
+import numpy as np
+
 np.random.seed(42)  # Set random seed if needed
 class SoftmaxPerceptron:
     def __init__(self, weights, learning_rate=0.01, max_iter=1000):
@@ -5,7 +7,38 @@ class SoftmaxPerceptron:
         self.max_iter = max_iter
         self.weights_ = weights
         
+    def calculate_accuracy(self, h, y):
+        """
+        Calculates the percentage of correctly classified instances.
+        """
 
+        m = len(y)
+        h = h.reshape(-1, 1)
+        y = y.reshape(-1, 1)
+        h[h >= 0.5] = 1
+        h[h < 0.5] = 0
+        accuracy = (1 / m) * np.sum(h == y)
+
+        return accuracy * 100
+    
+    def model(self, x):
+        a = self.bias + np.dot(x.T, self.weights)
+        return a.T
+    
+    def compute_gradient(self, x, y):
+        """
+        Computes the gradients of the weights and bias for SoftMax cost.
+        """
+        xb = np.insert(x, 0, 1).reshape(-1, 1) # calculate the gradient with bias
+        x = x.reshape(-1, 1) 
+        y = y.reshape(-1, 1)
+
+        gradient = xb @ ((np.exp(-y*self.model(x))/(np.exp(-y*self.model(x)) + 1)) * y)/float(np.size(y))
+
+        ##############################################################################
+        #                             END OF YOUR CODE                               #
+        ##############################################################################
+        return -1 * gradient.T
         
     def fit_sgd(self, X, y):
         np.random.seed(42)
@@ -13,8 +46,8 @@ class SoftmaxPerceptron:
         num_features, num_samples = X.shape  # Get the shape of the input data
 
         # Initialize weights
-        self.weights = self.weights_[1:].reshape(-1, 1)
-        self.bias = self.weights_[0]
+        self.weights = self.weights_[:, 1:].reshape(-1, 1)
+        self.bias = self.weights_[:, 0]
         
         
         accuracy_history = []  # Initialize loss history
@@ -37,6 +70,28 @@ class SoftmaxPerceptron:
         # returns this accuracy history to monitor the training progress.            #
         ##############################################################################
 
+        for _ in range(self.max_iter):
+            h_train = self.predict(X)
+            
+            # Compute the cost
+            #cost_train = self.compute_cost(h_train, y)
+            #print(cost_train, cost_test)
+
+            # pick random samples
+            rand_index = np.random.randint(0, num_samples)
+            sample_x = X[:, rand_index]
+            sample_y = y[rand_index]
+            gradient = self.compute_gradient(sample_x, sample_y)
+
+            # Update the weights and bias
+            self.weights -= self.learning_rate * gradient[:, 1:].reshape(-1, 1)
+            self.bias -= float(self.learning_rate * gradient[:, 0])
+            
+            # Calculate the percentage of correctly classified instances
+            train_accuracy = self.calculate_accuracy(h_train, y)
+            
+            # Append the accuracies to the lists
+            accuracy_history.append(train_accuracy)
 
         return accuracy_history
 
