@@ -52,9 +52,9 @@ class MinMaxScaler():
         self.min = None
         self.max = None
   
-    def fit(self, x):
-        self.min = np.min(x, axis=1)
-        self.max = np.max(x, axis=1)
+    def fit(self, x, axis=1):
+        self.min = np.min(x, axis=axis)
+        self.max = np.max(x, axis=axis)
 
     def transform(self, x):
         if self.min is None or self.max is None:

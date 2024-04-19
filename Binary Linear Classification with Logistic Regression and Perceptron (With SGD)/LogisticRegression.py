@@ -101,7 +101,7 @@ class LogisticRegression:
             return 0
 
         recall = tp / (tp + fn)
-        return recall 
+        return recall * 100
     
     def calculate_precision(self, h, y):
         """
@@ -118,7 +118,7 @@ class LogisticRegression:
             return 0
 
         precision = tp / (tp + fp)
-        return precision 
+        return precision * 100
     
     def calculate_f1_score(self, h, y):
         """
@@ -197,15 +197,22 @@ class LogisticRegression:
             # Update the weights and bias
             self._W -= self._alpha * gradient[:, 1:]
             self._B -= float(self._alpha * gradient[:, 0])
-            
-            # Calculate the percentage of correctly classified instances
+
             train_accuracy = self.calculate_accuracy(h_train, self._y_train)
+            train_precision = self.calculate_precision(h_train, self._y_train)
+            train_recall = self.calculate_recall(h_train, self._y_train)
+            train_f1 = self.calculate_f1_score(h_train, self._y_train)
+            train_metrics = [train_accuracy, train_precision, train_recall, train_f1]
+             
             test_accuracy = self.calculate_accuracy(h_test, self._y_test)
-            print(train_accuracy, test_accuracy)
+            test_precision = self.calculate_precision(h_test, self._y_test)
+            test_recall = self.calculate_recall(h_test, self._y_test)
+            test_f1 = self.calculate_f1_score(h_test, self._y_test)
+            test_metrics = [test_accuracy, test_precision, test_recall, test_f1]
             
-            # Append the accuracies to the lists
-            classified_correctly_train_list.append(train_accuracy)
-            classified_correctly_test_list.append(test_accuracy)
+            # Append the metrics to the lists
+            classified_correctly_train_list.append(train_metrics)
+            classified_correctly_test_list.append(test_metrics)
         
         ##############################################################################
         #                             END OF YOUR CODE                               #
@@ -251,14 +258,22 @@ class LogisticRegression:
             # Update the weights and bias
             self._W -= self._alpha * gradient[:, 1:]
             self._B -= float(self._alpha * gradient[:, 0])
-        
-            # Calculate the percentage of correctly classified instances
+
             train_accuracy = self.calculate_accuracy(h_train, self._y_train)
+            train_precision = self.calculate_precision(h_train, self._y_train)
+            train_recall = self.calculate_recall(h_train, self._y_train)
+            train_f1 = self.calculate_f1_score(h_train, self._y_train)
+            train_metrics = [train_accuracy, train_precision, train_recall, train_f1]
+             
             test_accuracy = self.calculate_accuracy(h_test, self._y_test)
+            test_precision = self.calculate_precision(h_test, self._y_test)
+            test_recall = self.calculate_recall(h_test, self._y_test)
+            test_f1 = self.calculate_f1_score(h_test, self._y_test)
+            test_metrics = [test_accuracy, test_precision, test_recall, test_f1]
             
-            # Append the accuracies to the lists
-            classified_correctly_train_list_sgd.append(train_accuracy)
-            classified_correctly_test_list_sgd.append(test_accuracy)
+            # Append the metrics to the lists
+            classified_correctly_train_list_sgd.append(train_metrics)
+            classified_correctly_test_list_sgd.append(test_metrics)
         
         ##############################################################################
         #                             END OF YOUR CODE                               #

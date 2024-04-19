@@ -23,6 +23,53 @@ class SoftmaxPerceptron:
 
         return accuracy * 100
     
+    def calculate_recall(self, h, y):
+        """
+        Calculates the recall.
+        """
+        h = h.reshape(-1, 1)
+        y = y.reshape(-1, 1)
+        h[h >= 0] = 1
+        h[h < 0] = -1
+        tp = np.sum((h == 1) & (y == 1))
+        fn = np.sum((h == -1) & (y == 1))
+
+        if tp + fn == 0:
+            return 0
+
+        recall = tp / (tp + fn)
+        return recall * 100
+    
+    def calculate_precision(self, h, y):
+        """
+        Calculates the precision.
+        """
+        h = h.reshape(-1, 1)
+        y = y.reshape(-1, 1)
+        h[h >= 0] = 1
+        h[h < 0] = -1
+        tp = np.sum((h == 1) & (y == 1))
+        fp = np.sum((h == 1) & (y == -1))
+
+        if tp + fp == 0:
+            return 0
+
+        precision = tp / (tp + fp)
+        return precision * 100
+    
+    def calculate_f1_score(self, h, y):
+        """
+        Calculates the F1 score.
+        """
+        recall = self.calculate_recall(h, y)
+        precision = self.calculate_precision(h, y)
+
+        if recall + precision == 0:
+            return 0
+        
+        f1_score = 2 * (precision * recall) / (precision + recall)
+        return f1_score
+    
     def model(self, x):
         a = self.bias + np.dot(x.T, self.weights)
         return a.T
@@ -94,17 +141,21 @@ class SoftmaxPerceptron:
             xt_w = np.dot(sample_x.T, self.weights) + self.bias
             sigmoid = -sample_y * (1 - (1 / (1 + np.exp(-sample_y * xt_w))))
 
-            grad_w = np.dot(sample_x, sigmoid)
-            grad_b = np.sum(sigmoid, axis= 0)
+            grad_w = np.dot(sample_x, sigmoid) / np.size(sample_y)
+            grad_b = np.sum(sigmoid, axis= 0) / np.size(sample_y)
 
             self.weights -= self.learning_rate * grad_w
             self.bias -= self.learning_rate * grad_b
 
             # Calculate the percentage of correctly classified instances
             train_accuracy = self.calculate_accuracy(h_train, y)
-            
+            train_precision = self.calculate_precision(h_train, y)
+            train_recall = self.calculate_recall(h_train, y)
+            train_f1 = self.calculate_f1_score(h_train, y)
+            metrics = [train_accuracy, train_precision, train_recall, train_f1]
+
             # Append the accuracies to the lists
-            accuracy_history.append(train_accuracy)
+            accuracy_history.append(metrics)
 
         return accuracy_history
 
@@ -157,10 +208,10 @@ class SoftmaxPerceptron:
 
         y = y.reshape(-1, 1)
 
-        print(self.weights.shape, self.bias.shape, X.shape, y.shape)
-        print(self.weights)
-        print()
-        print(self.bias)
+        #print(self.weights.shape, self.bias.shape, X.shape, y.shape)
+        #print(self.weights)
+        #print()
+        #print(self.bias)
         for _ in range(self.max_iter):
             xt_w = np.dot(X.T, self.weights) + self.bias
             sigmoid = -y * (1 - (1 / (1 + np.exp(-y * xt_w))))
@@ -175,10 +226,21 @@ class SoftmaxPerceptron:
             self.bias -= self.learning_rate * grad_b
             
             
-            predicitons = self.predict(X)
-            accuracy_history.append(self.calculate_accuracy(predicitons, y))
+            #predicitons = self.predict(X)
+            #accuracy_history.append(self.calculate_accuracy(predicitons, y))
             #accuracy = self.calculate_accuracy(predicitons, y)
             #accuracy_history.append(accuracy)
+            
+            h_train = self.predict(X)
+            # Calculate the percentage of correctly classified instances
+            train_accuracy = self.calculate_accuracy(h_train, y)
+            train_precision = self.calculate_precision(h_train, y)
+            train_recall = self.calculate_recall(h_train, y)
+            train_f1 = self.calculate_f1_score(h_train, y)
+            metrics = [train_accuracy, train_precision, train_recall, train_f1]
+            
+            # Append the accuracies to the lists
+            accuracy_history.append(metrics)
 
         return accuracy_history
 
