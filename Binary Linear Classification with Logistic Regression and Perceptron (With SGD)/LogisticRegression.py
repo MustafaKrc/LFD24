@@ -80,7 +80,9 @@ class LogisticRegression:
         y = y.reshape(-1, 1)
         h[h >= 0.5] = 1
         h[h < 0.5] = 0
-        accuracy = (1 / m) * np.sum(h == y)
+        tp = np.sum((h == 1) & (y == 1))
+        tn = np.sum((h == 0) & (y == 0))
+        accuracy = (tp + tn) / m
 
         return accuracy * 100
     
@@ -90,6 +92,8 @@ class LogisticRegression:
         """
         h = h.reshape(-1, 1)
         y = y.reshape(-1, 1)
+        h[h >= 0.5] = 1
+        h[h < 0.5] = 0
         tp = np.sum((h == 1) & (y == 1))
         fn = np.sum((h == 0) & (y == 1))
 
@@ -105,6 +109,8 @@ class LogisticRegression:
         """
         h = h.reshape(-1, 1)
         y = y.reshape(-1, 1)
+        h[h >= 0.5] = 1
+        h[h < 0.5] = 0
         tp = np.sum((h == 1) & (y == 1))
         fp = np.sum((h == 1) & (y == 0))
 
@@ -176,26 +182,26 @@ class LogisticRegression:
             h_test = self.h_theta(self._x_test)
             
             # Compute the cost
-            cost_train = self.compute_cost_MSE(h_train, self._y_train)
-            cost_test = self.compute_cost_MSE(h_test, self._y_test)
+            #cost_train = self.compute_cost_MSE(h_train, self._y_train)
+            #cost_test = self.compute_cost_MSE(h_test, self._y_test)
 
             #print("MSE COST: ", cost_train)
             #print(cost_train, cost_test)
 
-            for _ in range(self._x_train.shape[1]):
-                # pick random samples
-                rand_index = np.random.randint(0, self._m)
-                sample_x = self._x_train[:, rand_index]
-                sample_y = self._y_train[rand_index]
-                gradient = self.compute_gradient_MSE(sample_x, sample_y)
+            # pick random samples
+            rand_index = np.random.randint(0, self._m)
+            sample_x = self._x_train[:, rand_index]
+            sample_y = self._y_train[rand_index]
+            gradient = self.compute_gradient_MSE(sample_x, sample_y)
 
-                # Update the weights and bias
-                self._W -= self._alpha * gradient[:, 1:]
-                self._B -= float(self._alpha * gradient[:, 0])
+            # Update the weights and bias
+            self._W -= self._alpha * gradient[:, 1:]
+            self._B -= float(self._alpha * gradient[:, 0])
             
             # Calculate the percentage of correctly classified instances
             train_accuracy = self.calculate_accuracy(h_train, self._y_train)
             test_accuracy = self.calculate_accuracy(h_test, self._y_test)
+            print(train_accuracy, test_accuracy)
             
             # Append the accuracies to the lists
             classified_correctly_train_list.append(train_accuracy)
@@ -230,23 +236,22 @@ class LogisticRegression:
             h_test = self.h_theta(self._x_test)
             
             # Compute the cost
-            cost_train = self.compute_cost_CE(h_train, self._y_train)
-            cost_test = self.compute_cost_CE(h_test, self._y_test)
+            #cost_train = self.compute_cost_CE(h_train, self._y_train)
+            #cost_test = self.compute_cost_CE(h_test, self._y_test)
 
             #print("CE COST: ", cost_train)
             #print(cost_train, cost_test)
             
-            for _ in range(self._x_train.shape[1]):
-                #pick random samples
-                rand_index = np.random.randint(0, self._m)
-                sample_x = self._x_train[:, rand_index]
-                sample_y = self._y_train[rand_index]
-                gradient = self.compute_gradient_CE(sample_x, sample_y)
-                
-                # Update the weights and bias
-                self._W -= self._alpha * gradient[:, 1:]
-                self._B -= float(self._alpha * gradient[:, 0])
+            #pick random samples
+            rand_index = np.random.randint(0, self._m)
+            sample_x = self._x_train[:, rand_index]
+            sample_y = self._y_train[rand_index]
+            gradient = self.compute_gradient_CE(sample_x, sample_y)
             
+            # Update the weights and bias
+            self._W -= self._alpha * gradient[:, 1:]
+            self._B -= float(self._alpha * gradient[:, 0])
+        
             # Calculate the percentage of correctly classified instances
             train_accuracy = self.calculate_accuracy(h_train, self._y_train)
             test_accuracy = self.calculate_accuracy(h_test, self._y_test)
