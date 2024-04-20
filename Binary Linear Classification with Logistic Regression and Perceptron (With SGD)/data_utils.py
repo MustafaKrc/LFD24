@@ -53,8 +53,8 @@ class MinMaxScaler():
         self.max = None
   
     def fit(self, x, axis=1):
-        self.min = np.min(x, axis=axis)
-        self.max = np.max(x, axis=axis)
+        self.min = np.min(x)
+        self.max = np.max(x)
 
     def transform(self, x):
         if self.min is None or self.max is None:
@@ -67,10 +67,7 @@ class MinMaxScaler():
         # MinMaxScaler.html                                                          #
         ##############################################################################
         # Replace "pass" statement with your code
-        
-        x_scaled = x.copy()
-        for row in range(x.shape[0]):
-            x_scaled[row] = (x_scaled[row] - self.min[row]) / (self.max[row] - self.min[row]) * (self.max_limit - self.min_limit) + self.min_limit 
+        x_scaled = (x - np.min(x, axis=1, keepdims=True)) / (np.max(x, axis=1, keepdims=True) - np.min(x, axis=1, keepdims=True)) * (self.max_limit - self.min_limit) + self.min_limit
         
         
         ##############################################################################
