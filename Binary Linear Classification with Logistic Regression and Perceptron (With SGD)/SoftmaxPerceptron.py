@@ -5,7 +5,7 @@ class SoftmaxPerceptron:
     def __init__(self, weights, learning_rate=0.01, max_iter=1000):
         self.learning_rate = learning_rate
         self.max_iter = max_iter
-        self.weights_ = weights # weights_ is weights with bias
+        self.weights_ = weights.copy() # weights_ is weights with bias
         self.bias = None # why this wasnt even here in init...
         
     def calculate_accuracy(self, h, y):
