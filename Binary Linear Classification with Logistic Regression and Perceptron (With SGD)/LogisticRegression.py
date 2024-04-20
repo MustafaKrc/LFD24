@@ -98,7 +98,10 @@ class LogisticRegression:
         fn = np.sum((h == 0) & (y == 1))
 
         if tp + fn == 0:
-            return 0
+            if np.sum(h == 1) == 0 and np.sum(y == 1) == 0:
+                return 100  # If there are no positive predictions and no positive actual values, recall is 1 (or 100%)
+            else:
+                return 0
 
         recall = tp / (tp + fn)
         return recall * 100
@@ -115,7 +118,10 @@ class LogisticRegression:
         fp = np.sum((h == 1) & (y == 0))
 
         if tp + fp == 0:
-            return 0
+            if np.sum(h == 1) == 0 and np.sum(y == 1) == 0:
+                return 100  # If there are no positive predictions and no positive actual values, precision is 1 (or 100%)
+            else:
+                return 0
 
         precision = tp / (tp + fp)
         return precision * 100
@@ -178,8 +184,6 @@ class LogisticRegression:
 
         for _ in range(iterations):
 
-            h_train = self.h_theta(self._x_train)
-            h_test = self.h_theta(self._x_test)
             
             # Compute the cost
             #cost_train = self.compute_cost_MSE(h_train, self._y_train)
@@ -198,6 +202,9 @@ class LogisticRegression:
             self._W -= self._alpha * gradient[:, 1:]
             self._B -= float(self._alpha * gradient[:, 0])
 
+            h_train = self.h_theta(self._x_train)
+            h_test = self.h_theta(self._x_test)
+            
             train_accuracy = self.calculate_accuracy(h_train, self._y_train)
             train_precision = self.calculate_precision(h_train, self._y_train)
             train_recall = self.calculate_recall(h_train, self._y_train)
@@ -239,8 +246,6 @@ class LogisticRegression:
         
         for _ in range(iterations):
             
-            h_train = self.h_theta(self._x_train)
-            h_test = self.h_theta(self._x_test)
             
             # Compute the cost
             #cost_train = self.compute_cost_CE(h_train, self._y_train)
@@ -259,6 +264,8 @@ class LogisticRegression:
             self._W -= self._alpha * gradient[:, 1:]
             self._B -= float(self._alpha * gradient[:, 0])
 
+            h_train = self.h_theta(self._x_train)
+            h_test = self.h_theta(self._x_test)
             train_accuracy = self.calculate_accuracy(h_train, self._y_train)
             train_precision = self.calculate_precision(h_train, self._y_train)
             train_recall = self.calculate_recall(h_train, self._y_train)

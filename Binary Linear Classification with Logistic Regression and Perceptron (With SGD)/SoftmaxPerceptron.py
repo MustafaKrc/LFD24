@@ -35,7 +35,10 @@ class SoftmaxPerceptron:
         fn = np.sum((h == -1) & (y == 1))
 
         if tp + fn == 0:
-            return 0
+            if np.sum(h == 1) == 0 and np.sum(y == 1) == 0:
+                return 100  # If there are no positive predictions and no positive actual values, recall is 1 (or 100%)
+            else:
+                return 0
 
         recall = tp / (tp + fn)
         return recall * 100
@@ -52,7 +55,10 @@ class SoftmaxPerceptron:
         fp = np.sum((h == 1) & (y == -1))
 
         if tp + fp == 0:
-            return 0
+            if np.sum(h == 1) == 0 and np.sum(y == 1) == 0:
+                return 100  # If there are no positive predictions and no positive actual values, precision is 1 (or 100%)
+            else:
+                return 0
 
         precision = tp / (tp + fp)
         return precision * 100
@@ -69,32 +75,7 @@ class SoftmaxPerceptron:
         
         f1_score = 2 * (precision * recall) / (precision + recall)
         return f1_score
-    
-    def model(self, x):
-        a = self.bias + np.dot(x.T, self.weights)
-        return a.T
-    
-    def sigmoid(x):
-        return 1 / (1 + np.exp(-x))
-    
-    def compute_gradient(self, x, y):
-        """
-        Computes the gradients of the weights and bias for SoftMax cost.
-        """
 
-        y = y.reshape(-1, 1)
-
-        gradient = np.zeros((x.shape[0] + 1, 1))
-
-        for p in range(len(y)):
-            print((y[p] - SoftmaxPerceptron.sigmoid(self.model(x[p]))) * x[p])
-            gradient += (y[p] - SoftmaxPerceptron.sigmoid(self.model(x[p]))).dot(x[p].T)
-            
-
-        ##############################################################################
-        #                             END OF YOUR CODE                               #
-        ##############################################################################
-        return -1 * gradient.T / len(y)
         
     def fit_sgd(self, X, y):
         np.random.seed(42)
@@ -166,20 +147,7 @@ class SoftmaxPerceptron:
         predictions = np.sign(np.dot(X.T, self.weights).flatten() + self.bias)
         return predictions
     
-    def compute_regularized_gradient(self, x, y, regularization_strength):
-        """
-        Computes the gradients of the weights and bias for SoftMax cost with L2 regularization.
-        """
-        xb = np.insert(x, 0, 1).reshape(-1, 1)  # calculate the gradient with bias
-        #x = x.reshape(-1, 1)
-        y = y.reshape(-1, 1)
 
-        gradient = xb @ ((np.exp(-y * self.model(x)) / (np.exp(-y * self.model(x)) + 1)) * y) / float(np.size(y))
-
-        # Add L2 regularization term (exclude bias)
-        gradient[:, 1:] += 2 * regularization_strength * self.weights[:, 1:] 
-
-        return -1 * gradient.T
 
 
     def fit_gd_regularized(self, X, y, regularization_strength):
@@ -225,11 +193,6 @@ class SoftmaxPerceptron:
             self.weights -= self.learning_rate * grad_w
             self.bias -= self.learning_rate * grad_b
             
-            
-            #predicitons = self.predict(X)
-            #accuracy_history.append(self.calculate_accuracy(predicitons, y))
-            #accuracy = self.calculate_accuracy(predicitons, y)
-            #accuracy_history.append(accuracy)
             
             h_train = self.predict(X)
             # Calculate the percentage of correctly classified instances
